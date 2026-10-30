@@ -36,7 +36,7 @@ public class Main {
                 addToInventory(inventory,scanner);}
             else if (response.equalsIgnoreCase("c")) {
                 // Search for item by name
-                promptSearch(inventory,scanner,"-> Enter item name to search: ");
+                promptSearch(inventory,scanner);
             } else if (response.equalsIgnoreCase("d")) {
                 // Exit the app
                 System.out.println("-> Exiting the app...");
@@ -48,19 +48,46 @@ public class Main {
         }
     }
 
-    public static void promptSearch(Map<Integer,Product> inventory, Scanner scanner, String question) {
-        System.out.println("-> Enter item name: ");
-        String search = scanner.nextLine().trim();
+    public static void promptSearch(Map<Integer, Product> inventory, Scanner scanner) {
+        // Run while in searching state
+        boolean searching = true;
+        while (searching) {
+            // Prompt for item
+            System.out.print("\n-> Enter item name to search: ");
+            String search = scanner.nextLine().trim();
 
-        Product searchedProduct = searchInventory(inventory,search);
-        if (searchedProduct != null) {
-            System.out.println("\n[SEARCH RESULTS]");
+            // Display item if search passes
+            Product found = searchInventory(inventory, search);
+            if (found != null) {
+                // Search passed
+                System.out.println("\n[SEARCH RESULTS]");
+                System.out.printf("id: %d, name: %s, price: $%.2f%n",
+                        found.getId(), found.getName(), found.getPrice());
+            } else {
+                // Search failed
+                System.out.println("Error: Could not find search query");
+            }
 
-        } else {
-            System.out.println("Error: Could not find search query");
+            // Continues loop if you want to search again
+            searching = askSearchAgain(scanner);
         }
+        System.out.println();
+    }
 
-        System.out.println("Would you like to search again?");
+    private static boolean askSearchAgain(Scanner scanner) {
+        // Infinite asking loop, returns response to question as a boolean
+        while (true) {
+            System.out.print("-> Would you like to search again? (Y/N): ");
+            String response = scanner.nextLine().trim();
+
+            // Check response, loop again if invalid
+            if (response.equalsIgnoreCase("y")) {
+                return true;
+            } else if (response.equalsIgnoreCase("n")) {
+                return false;
+            }
+            System.out.println("Error: invalid response");
+        }
     }
 
     public static Product searchInventory(Map<Integer,Product> inventory, String search) {
@@ -123,11 +150,11 @@ public class Main {
 
     public static void openMenu() {
         System.out.println("[INVENTORY MENU]");
-        System.out.println("-> Choose a option from the list");
         System.out.println("A.) View inventory");
         System.out.println("B.) Add to inventory");
         System.out.println("C.) Search inventory");
         System.out.println("D.) Exit");
+        System.out.print("-> Choose a option from the list: ");
     }
 
     public static void getInventory(Map<Integer,Product> inventory, String fileName) {
